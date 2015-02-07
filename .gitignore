@@ -1,0 +1,8 @@
+*~
+*.bak
+*darcs*
+*#*#
+compiled
+week*
+Week*
+*coursera_submit.py
