@@ -1,0 +1,2 @@
+* Resource Page
+** [[http://resources.codingthematrix.com][Coding the Matrix Resources]]
