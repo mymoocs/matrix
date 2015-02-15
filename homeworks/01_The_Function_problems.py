@@ -20,7 +20,7 @@ def tuple_sum(A, B):
     >>> tuple_sum([(1,2), (10,20)],[(3,4), (30,40)])
     [(4, 6), (40, 60)]
     '''
-    pass
+    return  [(a+c, b+d) for ((a,b),(c,d)) in zip(A,B)]
 
 
 
@@ -33,10 +33,10 @@ def inv_dict(d):
       -dictionary representing the inverse of f, the returned dictionary's
        keys are the values of d and its values are the keys of d
     Examples:
-    >>> inv_dict({'goodbye':  'au revoir', 'thank you': 'merci'})
+    >>> inv_dict({'goodbye':'au revoir', 'thank you':'merci'})
     {'merci':'thank you', 'au revoir':'goodbye'}]
     '''
-    pass
+    return {v:k for (k,v) in d.items()}
 
 
 
@@ -52,21 +52,24 @@ def row(p, n):
     >>> row(10,4)
     [10, 11, 12, 13]
     '''
-    pass
+    return list(range(p, p+n))
 
-comprehension_with_row = ...
+comprehension_with_row = [row(x, 20) for x in  row(2,15)]
 
-comprehension_without_row = ...
+comprehension_without_row = [list(range(x, x+20)) for x in list(range(1,17))]
 
 
 
 ## 4: (Problem 4) Probability Exercise 1
-Pr_f_is_even = ...
-Pr_f_is_odd  = ...
+Pr_f_is_even = 0.7
+Pr_f_is_odd  = 0.3
 
 
 
 ## 5: (Problem 5) Probability Exercise 2
-Pr_g_is_1    = ...
-Pr_g_is_0or2 = ...
+Pr_g_is_1    = 0.4
+Pr_g_is_0or2 = 0.6
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
