@@ -15,7 +15,7 @@ def getitem(v,k):
     >>> v['b']
     0
     """
-    pass
+    return v.f[k]  if k in v.f else 0
 
 def setitem(v,k,val):
     """
@@ -31,7 +31,7 @@ def setitem(v,k,val):
     >>> v['a']
     1
     """
-    pass
+    v.f[k]=val
 
 def equal(u,v):
     """
@@ -61,7 +61,7 @@ def equal(u,v):
 
     """
     assert u.D == v.D
-    pass
+    return all([getitem(v,k) == getitem(u,k) for k in  u.f.keys() | v.f.keys()])
 
 def add(u,v):
     """
@@ -87,7 +87,7 @@ def add(u,v):
     True
     """
     assert u.D == v.D
-    pass
+    return Vec(u.D,{k:getitem(v,k) + getitem(u,k) for k in  u.f.keys() | v.f.keys()})
 
 def dot(u,v):
     """
@@ -118,7 +118,7 @@ def dot(u,v):
     12
     """
     assert u.D == v.D
-    pass
+    return sum([getitem(v,k)* getitem(u,k) for k in  u.f.keys() | v.f.keys()])
 
 def scalar_mul(v, alpha):
     """
@@ -135,7 +135,7 @@ def scalar_mul(v, alpha):
     >>> u == Vec({'x','y','z','w'},{'x':1,'y':2,'z':3,'w':4})
     True
     """
-    pass
+    return Vec(v.D, {k:v*alpha for (k,v) in v.f.items()})
 
 def neg(v):
     """
@@ -150,7 +150,7 @@ def neg(v):
     True
 
     """
-    pass
+    return scalar_mul(v, -1)
 
 ###############################################################################################################################
 
@@ -226,3 +226,7 @@ class Vec:
     def copy(self):
         "Don't make a new copy of the domain D"
         return Vec(self.D, self.f.copy())
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
