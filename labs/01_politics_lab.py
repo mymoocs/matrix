@@ -20,7 +20,8 @@ def create_voting_dict(strlist):
                 votes on bills
               all separated by spaces.
     Output: A dictionary that maps the last name of a senator
-            to a list of numbers representing the senator's voting record.
+            to a list of numbers repr
+esenting the senator's voting record.
     Example: 
         >>> vd = create_voting_dict(['Kennedy D MA -1 -1 1 1', 'Snowe R ME 1 1 1 1'])
         >>> vd == {'Snowe': [1, 1, 1, 1], 'Kennedy': [-1, -1, 1, 1]}
@@ -39,7 +40,7 @@ def create_voting_dict(strlist):
     The lists for each senator should preserve the order listed in voting data.
     In case you're feeling clever, this can be done in one line.
     """
-    pass
+    return {split(str)[0]:[int(s) for s in split(str)[2:]] for str in strlist}
 
 
 
@@ -162,3 +163,6 @@ def bitter_rivals(voting_dict):
     """
     return (..., ...)
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
