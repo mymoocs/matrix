@@ -1,0 +1,11 @@
+    > cabal update
+    > cabal install cabal-install
+    > cabal install --only-dependencies
+    > cabal configure --enable-tests
+    > cabal build
+    > cabal test
+
+Alternatively, you may run the tests in a single source file by using `doctest`
+explicitly. From the base directory of this source code:
+
+    x> doctest -isrc -Wall -fno-warn-type-defaults <filename.hs>
