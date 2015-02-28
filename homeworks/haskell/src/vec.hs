@@ -18,7 +18,7 @@ import qualified Test.HUnit.Util      as U
 import Prelude hiding (replicate, enumFromTo, enumFromThenTo, length, null)
 
 data Vec a = Vec {getDomain :: (S.Set a), getFun :: (M.Map a Int)}
-           deriving (Show, Eq)
+           deriving (Show)
 
 --instance Show (Vec ) where
 --  show v = "Vec({"++ show ((S.toList $ d v)::[Char]) ++ "}," ++ show (M.toList $ f v) ++  ")"
@@ -37,6 +37,8 @@ set  = S.fromList "erik salaj"
 set1 :: S.Set Char
 set1 = S.fromList "aaaaabbbb"
 
+vec :: Vec Char
+vec = Vec (S.fromList "abcd") (M.fromList [('a', 2), ('c', 1), ('d', 3)])
 ------------------------------------------------------------
 --  1. getItem
 ------------------------------------------------------------
@@ -59,8 +61,7 @@ getItem' :: (Ord k) => Vec k -> k -> Int
 getItem' v k = let dict = getFun v
               in M.findWithDefault 0 k dict  
 
-vec :: Vec Char
-vec = Vec (S.fromList "abcd") (M.fromList [('a', 2), ('c', 1), ('d', 3)])
+
 
 ex1 :: T.Test
 ex1 = T.TestList
@@ -96,6 +97,23 @@ ex2 = T.TestList
       U.teq "e20" (getItem (setItem vec 'a' 1) 'a') 1
     ]
 
+------------------------------------------------------------
+--  3. equal
+------------------------------------------------------------
+
+-- | check if two vectors are equal
+-- >>> equal  (Vec (S.fromList "abc") (M.fromList [('a', 0)])) (Vec (S.fromList "abc") (M.fromList [('b', 0)]))
+-- True
+-- >>> equal (Vec (S.fromList "xyz") (M.fromList [('y', 1), ('x', 2)])) (Vec (S.fromList "xyz") (M.fromList [('y', 1), ('z', 0)]))
+-- False
+-- >>> Vec (S.fromList "abc") (M.fromList [('a', 0), ('c', 1)]) == Vec (S.fromList "abc") (M.fromList [('a', 0), ('c', 1), ('b', 4)])
+-- False
+-- >>> Vec (S.fromList "abc") (M.fromList [('a', 0), ('c', 1), ('b', 4)]) == Vec (S.fromList "abc") (M.fromList [('a', 0), ('c', 1)])
+-- False
+-- >>> Vec (S.fromList "ab") (M.fromList [('a', 1)]) ==  Vec (S.fromList "ab") (M.fromList [('b', 1)])
+-- False
+-- >>> Vec (S.fromList "ab") (M.fromList [('a', 1)]) ==  Vec (S.fromList "ab") (M.fromList [('a', 2)])
+-- False
 
 equal :: Ord k => Vec k -> Vec k -> Bool
 equal v1 v2 = and [getItem v1 k == getItem v2 k | k <- allKeys]
@@ -103,12 +121,62 @@ equal v1 v2 = and [getItem v1 k == getItem v2 k | k <- allKeys]
     m1 = getFun v1
     m2 = getFun v2
     allKeys = S.toList $ S.union (M.keysSet m1) (M.keysSet m2)      
-  
+
+
+instance Ord  a => Eq (Vec a) where
+  (==) = equal
+
+ex3 :: T.Test
+ex3 = T.TestList
+    [
+        U.teq "e30" (equal vec vec) True
+      , U.teq "e31" (equal (setItem vec 'a' 1) vec) False
+      , U.teq "e32" (vec == vec) True
+      , U.teq "e33" ((setItem vec 'a' 1) == vec) False
+      , U.teq "e34" (equal (Vec (S.fromList "xyz") (M.fromList [('y', 1), ('x', 2)]))
+                     (Vec (S.fromList "xyz") (M.fromList [('y', 1), ('z', 0)]))) False
+      , U.teq "e35" (equal  (Vec (S.fromList "abc") (M.fromList [('a', 0)]))
+                     (Vec (S.fromList "abc") (M.fromList [('b', 0)]))) True
+      , U.teq "e36" ((==) (Vec (S.fromList "xyz") (M.fromList [('y', 1), ('x', 2)]))
+                     (Vec (S.fromList "xyz") (M.fromList [('y', 1), ('z', 0)]))) False
+        -- doctests
+      , U.teq "e37" ((==) (Vec (S.fromList "abc") (M.fromList [('a', 0)]))
+                     (Vec (S.fromList "abc") (M.fromList [('b', 0)]))) True
+      , U.teq "e38" (Vec (S.fromList "abc") (M.fromList [('a', 0), ('c', 1)])
+                     == Vec (S.fromList "abc") (M.fromList [('a', 0), ('c', 1), ('b', 4)])) False
+      , U.teq "e39" (Vec (S.fromList "abc") (M.fromList [('a', 0), ('c', 1), ('b', 4)])
+                     == Vec (S.fromList "abc") (M.fromList [('a', 0), ('c', 1)])) False
+      , U.teq "e40" (Vec (S.fromList "ab") (M.fromList [('a', 1)]) 
+                     ==  Vec (S.fromList "ab") (M.fromList [('b', 1)])) False
+      , U.teq "e41" (Vec (S.fromList "ab") (M.fromList [('a', 1)])
+                     ==  Vec (S.fromList "ab") (M.fromList [('a', 2)])) False
+    ]
+    
+
+------------------------------------------------------------
+--  4. +, *, - operator overloading
+------------------------------------------------------------
+
+instance  Ord a => Num (Vec a) where
+   v1 + v2 = Vec (getDomain v1)  (M.fromList [(k, getItem v1 k + getItem v2 k) | k <- allKeys])
+     where
+       f1 = getFun v1
+       f2 = getFun v2
+       allKeys = S.toList $ S.union (M.keysSet f1) (M.keysSet f2)      
+
+-- TODO make high leve function and use for +, * on vectors, equal
+       
+--   Pair (a,b) * Pair (c,d) = Pair (a*c,b*d)
+  -- Pair (a,b) - Pair (c,d) = Pair (a-c,b-d)
+  -- abs    (Pair (a,b)) = Pair (abs a,    abs b) 
+  -- signum (Pair (a,b)) = Pair (signum a, signum b) 
+  -- fromInteger i = Pair (fromInteger i, fromInteger i)
 
 hw1 :: IO T.Counts
 hw1 = do
   _ <- T.runTestTT ex1
-  T.runTestTT ex2
+  _ <- T.runTestTT ex2
+  T.runTestTT ex3
 
   
 

@@ -5,7 +5,8 @@ import    Test.HUnit.Base
 import    Vec
 
 main :: IO Counts
-main = undefined
+main = do
+  hw1
 
     
    
