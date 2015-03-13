@@ -1,4 +1,4 @@
-
+  
 {-# OPTIONS_GHC -Wall #-}
 
 module Vec where
@@ -17,7 +17,7 @@ import qualified Test.HUnit.Util      as U
 
 import Prelude hiding (replicate, enumFromTo, enumFromThenTo, length, null)
 
-data Vec a = Vec {getDomain :: (S.Set a), getFun :: (M.Map a Int)}
+data Vec a = Vec {getDomain :: (S.Set a), getFun :: (M.Map a Integer)}
            deriving (Show)
 
 --instance Show (Vec ) where
@@ -52,12 +52,12 @@ vec = Vec (S.fromList "abcd") (M.fromList [('a', 2), ('c', 1), ('d', 3)])
 -- 0
 
 
-getItem :: Ord k => Vec k -> k -> Int
+getItem :: Ord k => Vec k -> k -> Integer
 getItem v k = let dict = getFun v
               in case M.lookup k dict of
                   Nothing -> 0
                   Just x  -> x
-getItem' :: (Ord k) => Vec k -> k -> Int
+getItem' :: (Ord k) => Vec k -> k -> Integer
 getItem' v k = let dict = getFun v
               in M.findWithDefault 0 k dict  
 
@@ -85,7 +85,7 @@ ex1 = T.TestList
 -- >>> getItem (setItem v 'a' 1) 'a'
 -- 1
 
-setItem ::Ord a =>  Vec a -> a -> Int -> Vec a
+setItem ::Ord a =>  Vec a -> a -> Integer -> Vec a
 setItem vec k value = Vec domain (M.insert k value dict)
   where
     dict = getFun vec
@@ -157,13 +157,34 @@ ex3 = T.TestList
 --  4. +, *, - operator overloading
 ------------------------------------------------------------
 
-instance  Ord a => Num (Vec a) where
-   v1 + v2 = Vec (getDomain v1)  (M.fromList [(k, getItem v1 k + getItem v2 k) | k <- allKeys])
-     where
-       f1 = getFun v1
-       f2 = getFun v2
-       allKeys = S.toList $ S.union (M.keysSet f1) (M.keysSet f2)      
+applyVecOperator 
+  :: Ord k =>
+     (Integer -> Integer -> Integer)
+     -> Vec k
+     -> Vec k
+     -> Vec k
+applyVecOperator op v1 v2 =
+  Vec (getDomain v1)  (M.fromList [(k, op  (getItem v1 k) (getItem v2 k)) | k <- allKeys])
+  where
+    f1 = getFun v1
+    f2 = getFun v2
+    allKeys = S.toList $ S.union (M.keysSet f1) (M.keysSet f2)
 
+(<*>) :: Ord a => Vec a -> Integer -> Vec a
+(<*>) v alpha =
+  Vec (getDomain v) (M.fromList [(k, getItem v k * alpha ) | k <- S.toList $ M.keysSet (getFun v)])
+
+infixr 5 <*>   
+
+instance  Ord a => Num (Vec a) where
+   negate v =  v <*> (-1)
+--   fromInteger i = Vec (S.fromList (show i)) (M.fromList [('1', fromInteger i)])
+   v1 + v2 = applyVecOperator (+) v1 v2
+   v1 * v2 = applyVecOperator (*) v1 v2
+   v1 - v2 = v1 + (-v2)
+   -- abs = sqrt . sum . map (\(k,v)->v) . M.toList . getFun
+     
+--   v1 / v2 = scalarMul v (-1)
 -- TODO make high leve function and use for +, * on vectors, equal
        
 --   Pair (a,b) * Pair (c,d) = Pair (a*c,b*d)

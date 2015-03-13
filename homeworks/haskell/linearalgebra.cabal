@@ -18,6 +18,7 @@ cabal-version:       >=1.10
 library
   exposed-modules:    Main 
                     , Vec
+                    , GF2
 
   -- other-modules:       
   -- other-extensions:    
