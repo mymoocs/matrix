@@ -193,8 +193,8 @@ instance  Ord a => Num (Vec a) where
   -- signum (Pair (a,b)) = Pair (signum a, signum b) 
   -- fromInteger i = Pair (fromInteger i, fromInteger i)
 
-hw1 :: IO T.Counts
-hw1 = do
+vectorTests :: IO T.Counts
+vectorTests = do
   _ <- T.runTestTT ex1
   _ <- T.runTestTT ex2
   T.runTestTT ex3

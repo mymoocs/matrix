@@ -19,6 +19,7 @@ library
   exposed-modules:    Main 
                     , Vec
                     , GF2
+                    , Mat
 
   -- other-modules:       
   -- other-extensions:    

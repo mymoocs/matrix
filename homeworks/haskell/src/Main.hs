@@ -4,10 +4,14 @@ module Main where
 import    Test.HUnit.Base
 import    Vec
 import    GF2
+import Mat
 
 main :: IO Counts
 main = do
-  hw1
+  print "Vector tests"
+  vectorTests
+  print "Matrix tests"
+  matrixTests
 
     
    
